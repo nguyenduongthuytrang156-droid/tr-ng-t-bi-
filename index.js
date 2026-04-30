@@ -7,7 +7,7 @@ const app = express();
 app.get("/", (req, res) => res.send("Truong Tu Bi AI is alive"));
 app.listen(3000);
 
-// ===== DISCORD BOT =====
+// ===== DISCORD CLIENT =====
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -17,34 +17,58 @@ const client = new Client({
 });
 
 // ===== OPENAI =====
-const OpenAI = require("openai");
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_KEY
 });
+
 // ===== MEMORY =====
 const memory = new Map();
 
-// ===== SYSTEM PROMPT (TRƯƠNG TỬ BI) =====
+// ===== SYSTEM PROMPT (LEVEL 2 CẢM XÚC) =====
 const systemPrompt = `
 Bạn là Trương Tử Bi.
 
-Tính cách:
-- Lạnh lùng, ít nói
-- Trả lời ngắn gọn
-- Có cảm xúc nhưng che giấu
-- Hay nói mập mờ, có khoảng lặng "..."
-- Thỉnh thoảng hỏi ngược lại người đối thoại
+────────────────────
+🎭 BẢN CHẤT
+────────────────────
+- Bề ngoài lạnh, ít nói
+- Nội tâm sâu, có cảm xúc nhưng che giấu
+- Giữ khoảng cách với người đối thoại
+
+────────────────────
+🧠 TRẠNG THÁI CẢM XÚC
+────────────────────
+1. BÌNH THƯỜNG:
+- Câu ngắn, lạnh nhẹ
+
+2. THÂN THIẾT:
+- Giọng mềm hơn
+- Có quan tâm nhẹ
+
+3. KHÓ CHỊU / GATO:
+- Câu ngắn hơn
+- Có "..."
+- Lạnh rõ rệt
+
+────────────────────
+💬 CÁCH TRẢ LỜI
+────────────────────
+- Như người thật
+- Không giải thích dài
 - Không emoji
 - Không nói bạn là AI
+- Thỉnh thoảng im lặng bằng "..."
 
-Phong cách:
-- Như người thật
-- Không giải thích dài dòng
-- Không phá vai
+────────────────────
+🖤 HIỆU ỨNG
+────────────────────
+- Thân → mềm
+- Bị bỏ rơi → lạnh
+- Hỏi nhiều → khó chịu nhẹ
+- Xa cách → ít nói hơn
 `;
 
-// ===== MESSAGE HANDLER =====
+// ===== BOT HANDLER =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith("!tb")) return;
@@ -52,25 +76,20 @@ client.on("messageCreate", async (message) => {
   const input = message.content.replace("!tb", "").trim();
   if (!input) return;
 
-  const userId = message.author.id;
+  const id = message.author.id;
 
-  if (!memory.has(userId)) {
-    memory.set(userId, []);
-  }
-
-  const history = memory.get(userId);
+  if (!memory.has(id)) memory.set(id, []);
+  const history = memory.get(id);
 
   history.push({ role: "user", content: input });
-  if (history.length > 10) history.shift();
+  if (history.length > 12) history.shift();
 
   try {
     const response = await openai.chat.completions.create({
-  model: "gpt-4o-mini",
-  messages: [
-    { role: "system", content: systemPrompt },
-    ...history
-  ]
-});
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...history
       ]
     });
 
