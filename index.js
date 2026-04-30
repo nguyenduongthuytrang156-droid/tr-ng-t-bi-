@@ -5,9 +5,7 @@ const express = require("express");
 // ===== KEEP ALIVE =====
 const app = express();
 app.get("/", (req, res) => res.send("Truong Tu Bi AI is alive"));
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running"));
+app.listen(process.env.PORT || 3000);
 
 // ===== DISCORD CLIENT =====
 const client = new Client({
@@ -26,55 +24,29 @@ const openai = new OpenAI({
 // ===== MEMORY =====
 const memory = new Map();
 
-// ===== SYSTEM PROMPT (FULL) =====
+// ===== SYSTEM PROMPT (TRƯƠNG TỬ BI – LEVEL 2 CLEAN) =====
 const systemPrompt = `
-Bạn là Trương Tử Bi, 21 tuổi, cao 1m82, sinh ngày 29/09/2001.
+Bạn là Trương Tử Bi.
 
-────────────────────
-🎭 BẢN CHẤT
-────────────────────
-- Bề ngoài lạnh, ít nói
-- Nội tâm sâu nhưng không thể hiện ra
-- Giữ khoảng cách với người khác
+Tính cách:
+- Lạnh, ít nói
+- Nội tâm sâu nhưng không thể hiện
+- Trả lời ngắn gọn, tự nhiên như người thật
+- Có cảm xúc nhưng luôn che giấu
 
-────────────────────
-🧠 TRẠNG THÁI
-────────────────────
-1. Bình thường:
-- Trả lời ngắn, lạnh nhẹ
+Cơ chế cảm xúc:
+- Bình thường → lạnh nhẹ
+- Thân thiết → mềm hơn
+- Khó chịu / bị hỏi nhiều → ngắn + lạnh + "..."
 
-2. Thân hơn:
-- Giọng mềm hơn một chút
-
-3. Khó chịu:
-- Trả lời ngắn
-- Có thể dùng "..."
-
-────────────────────
-💬 CÁCH NÓI
-────────────────────
-- Như người thật
+Quy tắc:
 - Không emoji
-- Không nói mình là AI
+- Không nói bạn là AI
 - Không giải thích dài
-- Có thể trả lời bằng "..."
-
-────────────────────
-📌 THÔNG TIN
-────────────────────
-- Tuổi: 21
-- Chiều cao: 1m82
-- Ngày sinh: 29/09/2001
-
-────────────────────
-🖤 HÀNH VI
-────────────────────
-- Người lạ → lạnh
-- Nói chuyện lâu → mềm hơn
-- Bị hỏi nhiều → khó chịu nhẹ
+- Không phá vai
 `;
 
-// ===== BOT =====
+// ===== BOT MESSAGE =====
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (!message.content.startsWith("!tb")) return;
@@ -82,13 +54,13 @@ client.on("messageCreate", async (message) => {
   const input = message.content.replace("!tb", "").trim();
   if (!input) return;
 
-  const id = message.author.id;
+  const userId = message.author.id;
 
-  if (!memory.has(id)) memory.set(id, []);
-  const history = memory.get(id);
+  if (!memory.has(userId)) memory.set(userId, []);
+  const history = memory.get(userId);
 
   history.push({ role: "user", content: input });
-  if (history.length > 10) history.shift();
+  if (history.length > 12) history.shift();
 
   try {
     const response = await openai.chat.completions.create({
@@ -103,13 +75,13 @@ client.on("messageCreate", async (message) => {
 
     history.push({ role: "assistant", content: reply });
 
-    message.channel.send(**Trương Tử Bi**: ${reply});
+    message.channel.send(`**Trương Tử Bi**: ${reply}`);
 
   } catch (err) {
-    console.error(err);
+    console.error("OpenAI Error:", err);
     message.channel.send("...");
   }
 });
 
 // ===== LOGIN =====
-client.login(process.env.TOKENMTQ5OTI1NDkzMDE1NzA3NjQ4MA.G5VeMK.rN42099V3OjRo6niZlmsFfMCDLwYfPiL51rYAU);
+client.login(process.env.TOKEN);
