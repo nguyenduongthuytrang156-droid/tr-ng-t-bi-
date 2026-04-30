@@ -1,9 +1,7 @@
 {
-  "name": "truong-tu-bi-bot",
+  "name": "bot",
   "version": "1.0.0",
-  "description": "Discord AI bot Trương Tử Bi",
   "main": "index.js",
-  "type": "commonjs",
   "scripts": {
     "start": "node index.js"
   },
