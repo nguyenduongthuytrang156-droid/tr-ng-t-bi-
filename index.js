@@ -17,10 +17,11 @@ const client = new Client({
 });
 
 // ===== OPENAI =====
+const OpenAI = require("openai");
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_KEY
 });
-
 // ===== MEMORY =====
 const memory = new Map();
 
@@ -64,10 +65,12 @@ client.on("messageCreate", async (message) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...history
+  model: "gpt-4o-mini",
+  messages: [
+    { role: "system", content: systemPrompt },
+    ...history
+  ]
+});
       ]
     });
 
