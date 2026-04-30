@@ -1,7 +1,12 @@
 {
-  "name": "bot",
+  "name": "truong-tu-bi-bot",
   "version": "1.0.0",
+  "description": "Discord bot của Trương Tử Bi",
   "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node index.js"
   },
