@@ -112,4 +112,4 @@ client.on("messageCreate", async (message) => {
 });
 
 // ===== LOGIN =====
-client.login(process.env.TOKEN);
+client.login(process.env.TOKENMTQ5OTI1NDkzMDE1NzA3NjQ4MA.G5VeMK.rN42099V3OjRo6niZlmsFfMCDLwYfPiL51rYAU);
